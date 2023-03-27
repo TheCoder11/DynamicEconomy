@@ -1,0 +1,4 @@
+name: DynamicEeconomy
+version: '${project.version}'
+main: com.somemone.dynamiceeconomy.DynamicEeconomy
+api-version: 1.19
