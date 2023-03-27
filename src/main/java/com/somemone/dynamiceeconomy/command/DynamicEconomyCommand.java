@@ -16,6 +16,10 @@ public class DynamicEconomyCommand implements CommandExecutor {
     @Getter
     private Map<String, SubCommand> subcommands = new HashMap<>();
 
+    public DynamicEconomyCommand() {
+        subcommands.put("buy", new BuySubcommand());
+    }
+
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
