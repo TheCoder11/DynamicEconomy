@@ -19,6 +19,7 @@ public class MarketPosition { // A structure of a market's sales/price on a cert
     public static final String DATETIME_COLUMN_NAME = "date";
     public static final String AHS_COLUMN_NAME = "sales";
     public static final String DEMAND_SLOPE_COLUMN_NAME = "slope";
+    public static final String ESTABLISHED_COLUMN_NAME = "established";
 
     @Setter
     @Getter
@@ -50,16 +51,22 @@ public class MarketPosition { // A structure of a market's sales/price on a cert
     @DatabaseField(columnName = DEMAND_SLOPE_COLUMN_NAME)
     private float slope;
 
+    @Getter
+    @Setter
+    @DatabaseField(columnName = ESTABLISHED_COLUMN_NAME)
+    private boolean established;
+
     MarketPosition() {
 
     }
 
-    public MarketPosition(String item, float price, float ahs, LocalDateTime datetime, float slope) {
+    public MarketPosition(String item, float price, float ahs, LocalDateTime datetime, float slope, boolean established) {
         this.item = item;
         this.price = price;
         this.ahs = ahs;
         this.datetime = datetime;
         this.slope = slope;
+        this.established = established;
     }
 
 }

@@ -25,5 +25,9 @@ public class PluginConfig {
     private float sellMultiplier;
 
 
+    @Getter
+    private float APSDays;
+
+
 
 }

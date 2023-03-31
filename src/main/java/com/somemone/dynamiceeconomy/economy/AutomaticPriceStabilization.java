@@ -115,7 +115,7 @@ public class AutomaticPriceStabilization {
      */
     public void commitToDatabase() {
         MarketPosition marketPosition = new MarketPosition(itemMarket.name(), newPrice,
-                activeHoursPerSale, LocalDateTime.now(), slope);
+                activeHoursPerSale, LocalDateTime.now(), slope, false );
 
         MarketPositionHandler.writeMarketPosition(marketPosition);
     }
