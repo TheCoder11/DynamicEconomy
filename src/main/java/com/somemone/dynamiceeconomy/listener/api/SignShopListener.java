@@ -2,8 +2,8 @@ package com.somemone.dynamiceeconomy.listener.api;
 
 import com.somemone.dynamiceeconomy.db.SellerHandler;
 import com.somemone.dynamiceeconomy.db.TransactionHandler;
-import com.somemone.dynamiceeconomy.model.Seller;
-import com.somemone.dynamiceeconomy.model.Transaction;
+import com.somemone.dynamiceeconomy.db.model.Seller;
+import com.somemone.dynamiceeconomy.db.model.Transaction;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.wargamer2010.signshop.events.SSMoneyTransactionEvent;
@@ -20,10 +20,13 @@ public class SignShopListener implements Listener {
         }
         if (seller.isBanned()) return;
 
+        // TODO: Figure out SignShop's deal
+
         Transaction transaction = new Transaction(
                 event.getItems()[0].getType().name(),
                 1,
                 (float) event.getPrice(),
+                "buy",
                 seller,
                 LocalDateTime.now()
         );

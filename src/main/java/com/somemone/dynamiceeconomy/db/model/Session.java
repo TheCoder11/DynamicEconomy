@@ -1,4 +1,4 @@
-package com.somemone.dynamiceeconomy.model;
+package com.somemone.dynamiceeconomy.db.model;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Builder
 @DatabaseTable(tableName = "sessions")
@@ -47,6 +48,11 @@ public class Session {
 
     public Session(Player player, LocalDateTime startTime) {
         this.uuid = player.getUniqueId().toString();
+        this.startTime = startTime;
+    }
+
+    public Session(UUID uuid, LocalDateTime startTime) {
+        this.uuid = uuid.toString();
         this.startTime = startTime;
     }
 

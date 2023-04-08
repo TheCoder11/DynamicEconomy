@@ -4,7 +4,7 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.somemone.dynamiceeconomy.DynamicEeconomy;
-import com.somemone.dynamiceeconomy.model.Session;
+import com.somemone.dynamiceeconomy.db.model.Session;
 
 import java.sql.SQLException;
 import java.time.Duration;

@@ -2,8 +2,7 @@ package com.somemone.dynamiceeconomy.economy;
 
 import com.somemone.dynamiceeconomy.db.ObtainHandler;
 import com.somemone.dynamiceeconomy.db.SessionHandler;
-import com.somemone.dynamiceeconomy.model.ObtainMaterial;
-import org.bukkit.Material;
+import com.somemone.dynamiceeconomy.db.model.ObtainMaterial;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -15,7 +14,7 @@ public class StapleIndex {
 
     private Duration timeToSearch;
 
-    public StapleIndex(Material material, Duration timeToSearch) {
+    public StapleIndex(String material, Duration timeToSearch) {
 
         List<ObtainMaterial> allSales = ObtainHandler.getTransactionsWithItem(material);
         LocalDateTime cutoff = LocalDateTime.now().minus(timeToSearch);

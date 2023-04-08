@@ -1,10 +1,9 @@
-package com.somemone.dynamiceeconomy.model;
+package com.somemone.dynamiceeconomy.db.model;
 
 import com.j256.ormlite.field.DatabaseField;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

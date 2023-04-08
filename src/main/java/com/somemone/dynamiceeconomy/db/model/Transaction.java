@@ -1,4 +1,4 @@
-package com.somemone.dynamiceeconomy.model;
+package com.somemone.dynamiceeconomy.db.model;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -18,6 +18,7 @@ public class Transaction {
     public static final String PRICE_COLUMN_NAME = "price";
     public static final String SELLER_COLUMN_NAME = "seller";
     public static final String DATETIME_COLUMN_NAME = "saletime";
+    public static final String TYPE_COLUMN_NAME = "type";
 
 
     @Getter
@@ -50,15 +51,22 @@ public class Transaction {
     @DatabaseField(columnName = DATETIME_COLUMN_NAME)
     private LocalDateTime datetime;
 
+    @Getter
+    @Setter
+    @DatabaseField(columnName = TYPE_COLUMN_NAME)
+    private String type; // "buy" or "sell"
+
     public Transaction() {
 
     }
 
-    public Transaction(String material, int amount, float price, Seller seller, LocalDateTime datetime) {
+    public Transaction(String material, int amount, float price, String type, Seller seller, LocalDateTime datetime) {
         this.material = material;
         this.amount = amount;
         this.price = price;
         this.seller = seller;
         this.datetime = datetime;
+        this.type = type;
+
     }
 }

@@ -1,0 +1,16 @@
+
+# These materials will be tracked to determine how efficient the server's economy is.
+# Choose resources that are:
+#  - Integral to the server's economy
+#  - Are not directly connected to the economy (e.g. the currency is pegged)
+materialsToIndex: ["DIAMOND", "RAW_IRON", "ANCIENT_DEBRIS"]
+
+# When Automatic Price Stabilization is performed initially, this correction will be made
+correctionPercent: 30
+
+# Multiplier when selling goods. A value of 0.8 would mean that values have 20% less selling price than buying price.
+# NOTE: A value higher than 1.0 is a duplication glitch
+sellMultiplier: 0.8
+
+# Days between rounds of Automatic Price Stabilization
+APSDays: 1

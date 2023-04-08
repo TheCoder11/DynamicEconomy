@@ -2,8 +2,8 @@ package com.somemone.dynamiceeconomy.listener.api;
 
 import com.somemone.dynamiceeconomy.db.SellerHandler;
 import com.somemone.dynamiceeconomy.db.TransactionHandler;
-import com.somemone.dynamiceeconomy.model.Seller;
-import com.somemone.dynamiceeconomy.model.Transaction;
+import com.somemone.dynamiceeconomy.db.model.Seller;
+import com.somemone.dynamiceeconomy.db.model.Transaction;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.maxgamer.quickshop.api.event.ShopPurchaseEvent;
@@ -23,6 +23,7 @@ public class QuickShopListener implements Listener {
         Transaction transaction = new Transaction(event.getShop().getItem().getType().name(),
                 event.getAmount(),
                 (float) event.getTotal(),
+                "buy",
                 seller,
                 LocalDateTime.now());
 

@@ -1,4 +1,4 @@
-package com.somemone.dynamiceeconomy.model;
+package com.somemone.dynamiceeconomy.db.model;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -36,6 +36,10 @@ public class Seller {
         this.uuid = uuid;
         this.banned = banned;
         this.isPrivate = isPrivate;
+    }
+
+    public static Seller getServerSeller() {
+        return new Seller("6c8f7913-3eb7-4d51-9597-54f8b4e1735a", false, false);
     }
 
 }

@@ -2,8 +2,7 @@ package com.somemone.dynamiceeconomy.listener;
 
 import com.somemone.dynamiceeconomy.DynamicEeconomy;
 import com.somemone.dynamiceeconomy.db.SessionHandler;
-import com.somemone.dynamiceeconomy.model.Session;
-import lombok.Builder;
+import com.somemone.dynamiceeconomy.db.model.Session;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -22,6 +21,7 @@ public class JoinListener implements Listener {
     @EventHandler
     public void handle(PlayerQuitEvent event) {
         Session session = DynamicEeconomy.getActiveSessions().get(event.getPlayer().getUniqueId());
+        session.setEndTime(LocalDateTime.now());
         if (session != null) DynamicEeconomy.getActiveSessions().remove(event.getPlayer().getUniqueId());
 
         SessionHandler.writeSession(session);

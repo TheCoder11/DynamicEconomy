@@ -1,16 +1,21 @@
 package com.somemone.dynamiceeconomy.config;
 
+import com.somemone.dynamiceeconomy.DynamicEeconomy;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.Material;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 @AllArgsConstructor
 public class PluginConfig {
 
     @Getter
-    private List<Material> materialsToIndex;
+    private List<String> materialsToIndex;
 
     /**
      * When making a automatic correction without previous results, APS will raise or lower the price by this percentage.
@@ -27,6 +32,7 @@ public class PluginConfig {
 
     @Getter
     private float APSDays;
+
 
 
 

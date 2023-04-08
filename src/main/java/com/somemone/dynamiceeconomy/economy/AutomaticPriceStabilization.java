@@ -1,17 +1,17 @@
 package com.somemone.dynamiceeconomy.economy;
 
 import com.somemone.dynamiceeconomy.DynamicEeconomy;
+import com.somemone.dynamiceeconomy.config.StoresConfig;
 import com.somemone.dynamiceeconomy.db.MarketPositionHandler;
 import com.somemone.dynamiceeconomy.db.SessionHandler;
 import com.somemone.dynamiceeconomy.db.TransactionHandler;
-import com.somemone.dynamiceeconomy.model.MarketPosition;
-import com.somemone.dynamiceeconomy.model.Transaction;
+import com.somemone.dynamiceeconomy.db.model.MarketPosition;
+import com.somemone.dynamiceeconomy.db.model.Transaction;
 import lombok.Getter;
 import org.bukkit.Material;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 public class AutomaticPriceStabilization {
@@ -24,6 +24,9 @@ public class AutomaticPriceStabilization {
 
     @Getter
     private List<MarketPosition> pastPositions;
+
+    @Getter
+    private ItemStore store;
 
     /**
      *  The desired quantity of items sold, expressed in Active Hours per Sale
@@ -46,9 +49,20 @@ public class AutomaticPriceStabilization {
     @Getter
     private float slope;
 
-    public AutomaticPriceStabilization (float desiredQuantity, float currentPrice, Material itemMarket) {
-        this.desiredQuantity = desiredQuantity;
-        this.currentPrice = currentPrice;
+    @Getter
+    private boolean aps;
+
+    @Getter
+    private boolean established;
+
+    public AutomaticPriceStabilization (String item) {
+
+        StoresConfig instance = new StoresConfig();
+        store = instance.getStore(item);
+
+        this.desiredQuantity = store.getDesiredQuantity();
+        this.currentPrice = store.getPrice();
+        this.aps = store.isAps();
         this.pastPositions = MarketPositionHandler.getAllPositionsFromItem(itemMarket);
         int salesLastDay = 0;
         slope = 0f;
@@ -66,9 +80,28 @@ public class AutomaticPriceStabilization {
         float activeHours = SessionHandler.getHoursInDays(Duration.ofHours(1));
         activeHoursPerSale = activeHours / salesLastDay;
 
+        established = true;
+        if (pastPositions.size() == 0) {
+            established = false;
+        }
+        for (MarketPosition pos : pastPositions) {
+            if (!pos.isEstablished()) {
+                established = false;
+            }
+        }
+
+        if ( Math.abs(activeHoursPerSale - desiredQuantity) / ((activeHoursPerSale + desiredQuantity) / 2) < 0.1 ) {
+            established = true;
+        }
+
     }
 
     public float findBestPrice() {
+        if (!aps) {
+            newPrice = currentPrice;
+            return currentPrice;
+        }
+
         // If other values are present, find the line of best fit.
         if (pastPositions.size() > 0) {
             float count = pastPositions.size() + 1; // This includes the current position
@@ -99,7 +132,7 @@ public class AutomaticPriceStabilization {
 
 
         } else { // If none are present, raise or lower the price by a given amount.
-            float percentage = DynamicEeconomy.getConfig().getCorrectionPercent() / 100;
+            float percentage = DynamicEeconomy.getPluginConfig().getCorrectionPercent() / 100;
             if (activeHoursPerSale > desiredQuantity) { // Price will lower
                 newPrice = (currentPrice * (1 - percentage));
                 return newPrice;
@@ -115,7 +148,12 @@ public class AutomaticPriceStabilization {
      */
     public void commitToDatabase() {
         MarketPosition marketPosition = new MarketPosition(itemMarket.name(), newPrice,
-                activeHoursPerSale, LocalDateTime.now(), slope, false );
+                activeHoursPerSale, LocalDateTime.now(), slope, established );
+
+        StoresConfig config = new StoresConfig();
+        store.setPrice(newPrice);
+        config.putStore(store.getName(), store);
+        config.saveConfig();
 
         MarketPositionHandler.writeMarketPosition(marketPosition);
     }

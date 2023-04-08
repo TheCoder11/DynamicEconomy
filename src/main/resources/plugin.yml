@@ -2,3 +2,34 @@ name: DynamicEeconomy
 version: '${project.version}'
 main: com.somemone.dynamiceeconomy.DynamicEeconomy
 api-version: 1.19
+
+commands:
+  dynamiceconomy:
+    aliases: [de]
+    usage: /de help
+
+  dedebug:
+    usage: /dedebug help
+
+permissions:
+  dynamiceconomy.debug:
+    description: Debug controls (add transactions/sessions)
+    default: op
+  dynamiceconomy.buy:
+    description: Buy things from stores
+    default: true
+  dynamiceconomy.sell:
+    description: Sell things to stores
+    default: true
+  dynamiceconomy.admin.create:
+    description: Create new stores
+    default: op
+  dynamiceconomy.admin.index:
+    description: View staple indexes
+    default: op
+  dynamiceconomy.admin.*:
+    description: Bundle for admins
+    default: op
+    children:
+      dynamiceconomy.admin.create: true
+      dynamiceconomy.admin.index: true

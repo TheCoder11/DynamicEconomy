@@ -1,8 +1,7 @@
-package com.somemone.dynamiceeconomy.model;
+package com.somemone.dynamiceeconomy.db.model;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +15,7 @@ public class MarketPosition { // A structure of a market's sales/price on a cert
     public static final String ID_COLUMN_NAME = "id";
     public static final String ITEM_COLUMN_NAME = "item";
     public static final String PRICE_COLUMN_NAME = "price";
-    public static final String DATETIME_COLUMN_NAME = "date";
+    public static final String STARTTIME_COLUMN_NAME = "starttime";
     public static final String AHS_COLUMN_NAME = "sales";
     public static final String DEMAND_SLOPE_COLUMN_NAME = "slope";
     public static final String ESTABLISHED_COLUMN_NAME = "established";
@@ -38,8 +37,8 @@ public class MarketPosition { // A structure of a market's sales/price on a cert
 
     @Setter
     @Getter
-    @DatabaseField(columnName = DATETIME_COLUMN_NAME)
-    private LocalDateTime datetime;
+    @DatabaseField(columnName = STARTTIME_COLUMN_NAME)
+    private LocalDateTime starttime;
 
     @Setter
     @Getter
@@ -60,11 +59,11 @@ public class MarketPosition { // A structure of a market's sales/price on a cert
 
     }
 
-    public MarketPosition(String item, float price, float ahs, LocalDateTime datetime, float slope, boolean established) {
+    public MarketPosition(String item, float price, float ahs, LocalDateTime starttime, float slope, boolean established) {
         this.item = item;
         this.price = price;
         this.ahs = ahs;
-        this.datetime = datetime;
+        this.starttime = starttime;
         this.slope = slope;
         this.established = established;
     }

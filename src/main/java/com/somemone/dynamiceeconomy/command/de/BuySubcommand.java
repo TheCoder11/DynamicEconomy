@@ -1,8 +1,9 @@
-package com.somemone.dynamiceeconomy.command;
+package com.somemone.dynamiceeconomy.command.de;
 
 import com.somemone.dynamiceeconomy.DynamicEeconomy;
-import com.somemone.dynamiceeconomy.db.MarketPositionHandler;
-import com.somemone.dynamiceeconomy.model.MarketPosition;
+import com.somemone.dynamiceeconomy.command.SubCommand;
+import com.somemone.dynamiceeconomy.config.StoresConfig;
+import com.somemone.dynamiceeconomy.economy.ItemStore;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -11,14 +12,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 public class BuySubcommand extends SubCommand {
 
 
     @Override
-    void onCommand(CommandSender sender, Command command, String[] args) {
+    public void onCommand(CommandSender sender, Command command, String[] args) {
         if (!(sender instanceof Player)) return;
         Player player = (Player) sender;
 
@@ -38,20 +36,14 @@ public class BuySubcommand extends SubCommand {
             amount = Integer.parseInt(args[2]);
         }
 
-        List<MarketPosition> mp = MarketPositionHandler.getAllPositionsFromItem(material);
-        if (mp.size() == 0) {
+        StoresConfig instance = new StoresConfig();
+        if (instance.storeExists(material.name())) {
             player.sendMessage(ChatColor.RED + "There isn't a market for this item.");
+            return;
         }
-        LocalDateTime latest = mp.get(0).getDatetime();
-        MarketPosition latestPosition = mp.get(0);
-        for (MarketPosition pos : mp) {
-            if (pos.getDatetime().isAfter(latest)) {
-                latest = pos.getDatetime();
-                latestPosition = pos;
-            }
-        }
+        ItemStore store = instance.getStore(material.name());
 
-        float totalCost = latestPosition.getPrice() * amount;
+        float totalCost = store.getPrice() * amount;
         if (!DynamicEeconomy.getEcon().has((OfflinePlayer) player, totalCost)) {
             player.sendMessage(ChatColor.RED + "Insufficient funds in player account.");
         }
@@ -66,7 +58,7 @@ public class BuySubcommand extends SubCommand {
     }
 
     @Override
-    String getPermission() {
+    public String getPermission() {
         return "dynamiceconomy.buy";
     }
 }

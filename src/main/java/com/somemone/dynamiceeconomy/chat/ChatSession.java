@@ -8,6 +8,8 @@ public interface ChatSession {
 
     public String nextResponse(String input);
 
+    public void start();
+
     public void whenDone();
 
     public Player getPlayer();

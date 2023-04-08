@@ -1,11 +1,11 @@
 package com.somemone.dynamiceeconomy.command;
 
+import com.somemone.dynamiceeconomy.command.de.*;
 import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -18,6 +18,10 @@ public class DynamicEconomyCommand implements CommandExecutor {
 
     public DynamicEconomyCommand() {
         subcommands.put("buy", new BuySubcommand());
+        registerCommand("help", new DEHelpSubcommand());
+        registerCommand("index", new IndexSubcommand());
+        registerCommand("sell", new SellSubcommand());
+        registerCommand("createstore", new CreateStoreSubcommand());
     }
 
     @Override
@@ -30,8 +34,13 @@ public class DynamicEconomyCommand implements CommandExecutor {
 
         for (String alias : subcommands.keySet()) {
             if (alias.equals(args[0])) {
-                subcommands.get(alias).onCommand(commandSender, command, args);
-                return true;
+                if (commandSender.hasPermission( subcommands.get(alias).getPermission() )) {
+                    subcommands.get(alias).onCommand(commandSender, command, args);
+                    return true;
+                } else {
+                    commandSender.sendMessage(ChatColor.RED + "You do not have the permission to execute this command");
+                    return true;
+                }
             }
         }
 

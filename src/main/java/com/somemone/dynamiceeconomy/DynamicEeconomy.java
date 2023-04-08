@@ -2,26 +2,25 @@ package com.somemone.dynamiceeconomy;
 
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
+import com.somemone.dynamiceeconomy.chat.ChatSessionManager;
 import com.somemone.dynamiceeconomy.config.APIPresence;
 import com.somemone.dynamiceeconomy.config.PluginConfig;
 import com.somemone.dynamiceeconomy.listener.api.ChestShopListener;
 import com.somemone.dynamiceeconomy.listener.api.QuickShopListener;
 import com.somemone.dynamiceeconomy.listener.api.ShopChestListener;
 import com.somemone.dynamiceeconomy.listener.api.SignShopListener;
-import com.somemone.dynamiceeconomy.model.Session;
+import com.somemone.dynamiceeconomy.db.model.Session;
 import lombok.Getter;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -34,7 +33,10 @@ public final class DynamicEeconomy extends JavaPlugin {
     private static HashMap<UUID, Session> activeSessions;
 
     @Getter
-    private static PluginConfig config;
+    private static ChatSessionManager chatSessionManager;
+
+    @Getter
+    private static PluginConfig pluginConfig;
 
     @Getter
     private static APIPresence apiPresence;
@@ -48,6 +50,9 @@ public final class DynamicEeconomy extends JavaPlugin {
     @Getter
     private static Chat chat = null;
 
+    @Getter
+    private static JavaPlugin instance;
+
     @Override
     public void onEnable() {
         try {
@@ -60,7 +65,10 @@ public final class DynamicEeconomy extends JavaPlugin {
 
         activeSessions = new HashMap<>();
 
-        config = new PluginConfig(Arrays.asList(Material.DIAMOND, Material.RAW_IRON, Material.ANCIENT_DEBRIS), 30, 0.8f);
+        pluginConfig = new PluginConfig(getConfig().getStringList("materialsToIndex"),
+                getConfig().getInt("correctionPercent"),
+                getConfig().getLong("sellMultiplier"),
+                getConfig().getInt("APSDays"));
 
         loadAPIs();
 
@@ -70,6 +78,10 @@ public final class DynamicEeconomy extends JavaPlugin {
         }
         setupPermissions();
         setupChat();
+
+        instance = this;
+
+        chatSessionManager = new ChatSessionManager();
 
     }
 
@@ -127,5 +139,9 @@ public final class DynamicEeconomy extends JavaPlugin {
         if (apiPresence.isSignShop()) {
             Bukkit.getPluginManager().registerEvents(new SignShopListener(), this);
         }
+    }
+
+    public static String getPrefix() {
+        return ChatColor.GOLD + "[" + ChatColor.YELLOW + "DynamicEconomy" + ChatColor.GOLD + "]" + ChatColor.RESET;
     }
 }
