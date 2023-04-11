@@ -2,13 +2,12 @@ package com.somemone.dynamiceeconomy.db.model;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-@Builder
 @DatabaseTable(tableName = "marketpositions")
 public class MarketPosition { // A structure of a market's sales/price on a certain day in a single item
 
@@ -16,7 +15,7 @@ public class MarketPosition { // A structure of a market's sales/price on a cert
     public static final String ITEM_COLUMN_NAME = "item";
     public static final String PRICE_COLUMN_NAME = "price";
     public static final String STARTTIME_COLUMN_NAME = "starttime";
-    public static final String AHS_COLUMN_NAME = "sales";
+    public static final String SAH_COLUMN_NAME = "sah"; // Sales per Active Hour
     public static final String DEMAND_SLOPE_COLUMN_NAME = "slope";
     public static final String ESTABLISHED_COLUMN_NAME = "established";
 
@@ -38,12 +37,12 @@ public class MarketPosition { // A structure of a market's sales/price on a cert
     @Setter
     @Getter
     @DatabaseField(columnName = STARTTIME_COLUMN_NAME)
-    private LocalDateTime starttime;
+    private Timestamp starttime;
 
     @Setter
     @Getter
-    @DatabaseField(columnName = AHS_COLUMN_NAME)
-    private float ahs;
+    @DatabaseField(columnName = SAH_COLUMN_NAME)
+    private float sah;
 
     @Setter
     @Getter
@@ -59,13 +58,27 @@ public class MarketPosition { // A structure of a market's sales/price on a cert
 
     }
 
-    public MarketPosition(String item, float price, float ahs, LocalDateTime starttime, float slope, boolean established) {
+    public MarketPosition(int id, String item, float price, float sah, LocalDateTime starttime, float slope, boolean established) {
+        this.id = id;
         this.item = item;
         this.price = price;
-        this.ahs = ahs;
-        this.starttime = starttime;
+        this.sah = sah;
+        this.starttime = Timestamp.valueOf(starttime);
         this.slope = slope;
         this.established = established;
+    }
+
+    public MarketPosition(String item, float price, float sah, LocalDateTime starttime, float slope, boolean established) {
+        this.item = item;
+        this.price = price;
+        this.sah = sah;
+        this.starttime = Timestamp.valueOf(starttime);
+        this.slope = slope;
+        this.established = established;
+    }
+
+    public LocalDateTime getStarttime() {
+        return starttime.toLocalDateTime();
     }
 
 }

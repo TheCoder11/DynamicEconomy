@@ -4,6 +4,7 @@ import com.somemone.dynamiceeconomy.db.SellerHandler;
 import com.somemone.dynamiceeconomy.db.TransactionHandler;
 import com.somemone.dynamiceeconomy.db.model.Seller;
 import com.somemone.dynamiceeconomy.db.model.Transaction;
+import com.somemone.dynamiceeconomy.economy.ItemStore;
 import de.epiceric.shopchest.event.ShopBuySellEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,10 +21,7 @@ public class ShopChestListener implements Listener {
         }
         if (seller.isBanned()) return;
 
-        String type = "sell";
-        if (event.getType().equals(ShopBuySellEvent.Type.BUY)) {
-            type = "buy";
-        }
+        ItemStore.APSType type = ItemStore.APSType.valueOf(event.getType().name());
 
         Transaction transaction = new Transaction(
                 event.getShop().getProduct().getType().name(),

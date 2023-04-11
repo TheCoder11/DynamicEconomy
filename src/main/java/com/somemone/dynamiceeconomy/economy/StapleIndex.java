@@ -29,7 +29,7 @@ public class StapleIndex {
 
     }
 
-    public float getStapleIndexAHS () {
+    public float getStapleIndexSAH() {
 
         float activeHours = SessionHandler.getHoursInDays(timeToSearch);
 

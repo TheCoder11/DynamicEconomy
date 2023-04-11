@@ -16,13 +16,13 @@ public class CreateStoreSubcommand extends SubCommand {
         if (!(sender instanceof Player)) return;
         Player player = (Player) sender;
 
-        if (args.length != 1) {
-            player.sendMessage(DynamicEeconomy.getPrefix() + ChatColor.RED + "/de createstore <item>");
+        if (args.length != 2) {
+            player.sendMessage(DynamicEeconomy.getPrefix() + ChatColor.RED + "/de createstore <item> 1");
             return;
         }
-        Material material = Material.getMaterial(args[0]);
+        Material material = Material.getMaterial(args[1]);
         if (material == null) {
-            player.sendMessage(DynamicEeconomy.getPrefix() + ChatColor.RED + "/de createstore <item>");
+            player.sendMessage(DynamicEeconomy.getPrefix() + ChatColor.RED + "/de createstore <item> 2");
             return;
         }
 

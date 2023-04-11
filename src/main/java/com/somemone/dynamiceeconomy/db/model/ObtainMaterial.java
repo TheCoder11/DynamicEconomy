@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -34,7 +35,7 @@ public class ObtainMaterial {
     @Getter
     @Setter
     @DatabaseField(columnName = DATETIME_COLUMN_NAME)
-    private LocalDateTime datetime;
+    private Timestamp datetime;
 
     public ObtainMaterial() {
 
@@ -43,6 +44,10 @@ public class ObtainMaterial {
     public ObtainMaterial(Material material, UUID playerUuid) {
         this.material = material.name();
         this.playerUuid = playerUuid.toString();
+    }
+
+    public LocalDateTime getDatetime() {
+        return datetime.toLocalDateTime();
     }
 
 }

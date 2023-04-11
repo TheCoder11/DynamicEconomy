@@ -5,10 +5,7 @@ import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.table.TableUtils;
 import com.somemone.dynamiceeconomy.DynamicEeconomy;
-import com.somemone.dynamiceeconomy.db.model.MarketPosition;
-import com.somemone.dynamiceeconomy.db.model.Seller;
-import com.somemone.dynamiceeconomy.db.model.Session;
-import com.somemone.dynamiceeconomy.db.model.Transaction;
+import com.somemone.dynamiceeconomy.db.model.*;
 import org.bukkit.Material;
 
 import java.sql.SQLException;
@@ -20,6 +17,7 @@ public class TransactionHandler {
 
         try {
             TableUtils.createTableIfNotExists(DynamicEeconomy.getConnectionSource(), Transaction.class);
+            TableUtils.createTableIfNotExists(DynamicEeconomy.getConnectionSource(), ObtainMaterial.class);
             TableUtils.createTableIfNotExists(DynamicEeconomy.getConnectionSource(), Seller.class);
             TableUtils.createTableIfNotExists(DynamicEeconomy.getConnectionSource(), Session.class);
             TableUtils.createTableIfNotExists(DynamicEeconomy.getConnectionSource(), MarketPosition.class);

@@ -2,6 +2,7 @@ package com.somemone.dynamiceeconomy.economy;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -22,27 +23,31 @@ public class ItemStore {
     private float desiredQuantity;
 
     @Getter
+    private APSType apsTrackingType;
+
+    @Getter
     private boolean enabled;
 
     @Getter
     private boolean aps;
 
-    public ItemStore(String name, float desiredQuantity, float price, boolean aps) {
+    public ItemStore(String name, float desiredQuantity, float price, boolean aps, String trackingType) {
         this.name = name;
-        this.displayName = name;
+        this.displayName = Material.getMaterial(name).getItemTranslationKey();
         this.desiredQuantity = desiredQuantity;
         this.price = price;
         this.enabled = true;
         this.aps = aps;
     }
 
-    public ItemStore(String name, String displayName, float desiredQuantity, float price, boolean aps) {
+    public ItemStore(String name, String displayName, float desiredQuantity, float price, boolean aps, APSType trackingType) {
         this.name = name;
         this.displayName = name;
         this.desiredQuantity = desiredQuantity;
         this.price = price;
         this.enabled = true;
         this.aps = aps;
+        this.apsTrackingType = trackingType;
     }
 
     public ItemStore(ConfigurationSection section) {
@@ -52,6 +57,7 @@ public class ItemStore {
         price = section.getLong("price");
         enabled = section.getBoolean("enabled");
         aps = section.getBoolean("aps");
+        apsTrackingType = APSType.valueOf(section.getString("tracking_type"));
     }
 
     public ConfigurationSection toSection() {
@@ -59,11 +65,17 @@ public class ItemStore {
         section.set("name", name);
         section.set("display_name", displayName);
         section.set("desired_quantity", desiredQuantity);
-        section.get("price", price);
-        section.get("enabled", enabled);
-        section.get("aps", aps);
+        section.set("price", (double) price);
+        section.set("enabled", enabled);
+        section.set("aps", aps);
+        section.set("tracking_type", apsTrackingType.name());
 
         return section;
+    }
+
+    public enum APSType {
+        BUY,
+        SELL;
     }
 
 

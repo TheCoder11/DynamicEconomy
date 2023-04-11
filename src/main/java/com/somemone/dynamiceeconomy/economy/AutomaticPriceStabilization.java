@@ -12,6 +12,7 @@ import org.bukkit.Material;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class AutomaticPriceStabilization {
@@ -35,7 +36,7 @@ public class AutomaticPriceStabilization {
     private float desiredQuantity;
 
     @Getter
-    private float activeHoursPerSale;
+    private float salesPerActiveHour;
 
     @Getter
     private float currentPrice;
@@ -59,6 +60,7 @@ public class AutomaticPriceStabilization {
 
         StoresConfig instance = new StoresConfig();
         store = instance.getStore(item);
+        itemMarket = Material.matchMaterial(item);
 
         this.desiredQuantity = store.getDesiredQuantity();
         this.currentPrice = store.getPrice();
@@ -68,17 +70,27 @@ public class AutomaticPriceStabilization {
         slope = 0f;
 
         List<Transaction> pastSales = TransactionHandler.getTransactionsWithItem(itemMarket);
-        LocalDateTime timeDesired = LocalDateTime.now().minusDays(1l);
+
+        LocalDateTime timeDesired = LocalDateTime.MIN;
+        for (MarketPosition pos : pastPositions)
+            if (pos.getStarttime().isAfter(timeDesired))
+                timeDesired = pos.getStarttime();
+
+
         for (Transaction sale : pastSales) {
-            if (sale.getDatetime().isAfter(timeDesired) && !sale.getSeller().isPrivate()) {
-                salesLastDay++;
-            } else {
-                break;
+            ItemStore.APSType type = sale.getType();
+
+            if (sale.getDatetime().isAfter(timeDesired) && !sale.getSeller().isPrivate() && store.getApsTrackingType().equals(type)) {
+                salesLastDay += sale.getAmount();
             }
         }
 
-        float activeHours = SessionHandler.getHoursInDays(Duration.ofHours(1));
-        activeHoursPerSale = activeHours / salesLastDay;
+        Duration dur = Duration.between(timeDesired, LocalDateTime.now());
+        if (dur.isZero()) dur = ChronoUnit.FOREVER.getDuration();
+
+        float activeHours = SessionHandler.getHoursInDays(dur);
+
+        salesPerActiveHour = salesLastDay / activeHours;
 
         established = true;
         if (pastPositions.size() == 0) {
@@ -90,7 +102,7 @@ public class AutomaticPriceStabilization {
             }
         }
 
-        if ( Math.abs(activeHoursPerSale - desiredQuantity) / ((activeHoursPerSale + desiredQuantity) / 2) < 0.1 ) {
+        if ( Math.abs(salesPerActiveHour - desiredQuantity) / ((salesPerActiveHour + desiredQuantity) / 2) < 0.1 ) {
             established = true;
         }
 
@@ -103,43 +115,49 @@ public class AutomaticPriceStabilization {
         }
 
         // If other values are present, find the line of best fit.
-        if (pastPositions.size() > 0) {
-            float count = pastPositions.size() + 1; // This includes the current position
-            float sumQ = 0f;
-            float sumP = 0f;
-            float sumQ2 = 0f;
-            float sumPQ = 0f;
-            for (MarketPosition mp : pastPositions) {
-                sumQ += mp.getAhs();
-                sumP += mp.getPrice();
-                sumQ2 += Math.pow(mp.getAhs(), 2);
-                sumPQ += mp.getPrice() * mp.getAhs();
+        if (pastPositions.size() > 1) {
+
+            float[] sahValues = new float[pastPositions.size()];
+            float[] priceValues = new float[pastPositions.size()];
+
+            priceValues[0] = pastPositions.get(0).getPrice(); // Re-assign
+            for (int i = 1; i < pastPositions.size(); i++) {
+                priceValues[i] = pastPositions.get(i).getPrice();
+                sahValues[i - 1] = pastPositions.get(i).getSah();
             }
-            sumQ += activeHoursPerSale;
-            sumP += currentPrice;
-            sumQ2 += Math.pow(activeHoursPerSale, 2);
-            sumPQ += activeHoursPerSale * currentPrice;
+            sahValues[sahValues.length - 1] = salesPerActiveHour;
 
-            float QMean = sumQ / count;
-            float PMean = sumP / count;
+            LinearRegression linReg = new LinearRegression(sahValues, priceValues);
+            slope = linReg.slope();
 
-            float slope = (sumPQ - sumQ * PMean) / (sumQ2 - sumQ * QMean);
-            float pInt = PMean - slope * QMean;
+            if (slope > 0) { // Shouldn't happen, people are messing with the algorithm (means people buy more when prices are high
+                float percentage = DynamicEeconomy.getPluginConfig().getCorrectionPercent() / 100f;
+                if (salesPerActiveHour < desiredQuantity) { // Price will lower
+                    newPrice = (currentPrice * (1 - percentage));
+                } else {
+                    newPrice = (currentPrice * (1 + percentage));
+                }
+            } else {
+                // Return result at desired quanitity on projected demand line
+                newPrice = linReg.predict(desiredQuantity);
+            }
 
-            // Return result at desired quanitity on projected demand line
-            newPrice = pInt + (slope * desiredQuantity);
             return newPrice;
 
 
         } else { // If none are present, raise or lower the price by a given amount.
-            float percentage = DynamicEeconomy.getPluginConfig().getCorrectionPercent() / 100;
-            if (activeHoursPerSale > desiredQuantity) { // Price will lower
-                newPrice = (currentPrice * (1 - percentage));
-                return newPrice;
+            float percentage = DynamicEeconomy.getPluginConfig().getCorrectionPercent() / 100f;
+            if (Math.abs(salesPerActiveHour - desiredQuantity) / ((salesPerActiveHour + desiredQuantity) / 2) < DynamicEeconomy.getPluginConfig().getEstablishPercent()) {
+                established = true;
+                newPrice = currentPrice;
             } else {
-                newPrice = (currentPrice * (1 + percentage));
-                return newPrice;
+                if (salesPerActiveHour < desiredQuantity) { // Price will lower
+                    newPrice = (currentPrice * (1 - percentage));
+                } else {
+                    newPrice = (currentPrice * (1 + percentage));
+                }
             }
+            return newPrice;
         }
     }
 
@@ -148,7 +166,7 @@ public class AutomaticPriceStabilization {
      */
     public void commitToDatabase() {
         MarketPosition marketPosition = new MarketPosition(itemMarket.name(), newPrice,
-                activeHoursPerSale, LocalDateTime.now(), slope, established );
+                salesPerActiveHour, LocalDateTime.now(), slope, established );
 
         StoresConfig config = new StoresConfig();
         store.setPrice(newPrice);

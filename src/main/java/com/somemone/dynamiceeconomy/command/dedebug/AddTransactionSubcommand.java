@@ -2,10 +2,12 @@ package com.somemone.dynamiceeconomy.command.dedebug;
 
 import com.somemone.dynamiceeconomy.DynamicEeconomy;
 import com.somemone.dynamiceeconomy.command.SubCommand;
+import com.somemone.dynamiceeconomy.config.StoresConfig;
 import com.somemone.dynamiceeconomy.db.MarketPositionHandler;
 import com.somemone.dynamiceeconomy.db.TransactionHandler;
 import com.somemone.dynamiceeconomy.db.model.Seller;
 import com.somemone.dynamiceeconomy.db.model.Transaction;
+import com.somemone.dynamiceeconomy.economy.ItemStore;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -18,36 +20,41 @@ public class AddTransactionSubcommand extends SubCommand {
     @Override
     public void onCommand(CommandSender sender, Command command, String[] args) {
 
-        if (args.length < 2) {
-            sender.sendMessage(DynamicEeconomy.getPrefix() + ChatColor.RED + "/dedebug addtransaction <item> <amount> [price]");
+        if (args.length < 4) {
+            sender.sendMessage(DynamicEeconomy.getPrefix() + ChatColor.RED + "/dedebug addtransaction <item> <amount> <type> [price]");
             return;
         }
 
         try {
-            Material.getMaterial(args[0]);
-            Integer.parseInt(args[1]);
-            if (args.length == 3) Float.parseFloat(args[2]);
+            Material.getMaterial(args[1]);
+            Integer.parseInt(args[2]);
+            ItemStore.APSType.valueOf(args[3].toUpperCase());
+            if (args.length == 5) Float.parseFloat(args[4]);
         } catch (Exception e) {
-            sender.sendMessage(DynamicEeconomy.getPrefix() + ChatColor.RED + "/dedebug addtransaction <item> <amount> [price]");
+            sender.sendMessage(DynamicEeconomy.getPrefix() + ChatColor.RED + "/dedebug addtransaction <item> <amount> <type> [price]");
             return;
         }
 
-        Material material = Material.getMaterial(args[0]);
-        int amount = Integer.parseInt(args[1]);
+        Material material = Material.getMaterial(args[1]);
+        int amount = Integer.parseInt(args[2]);
+        ItemStore.APSType type = ItemStore.APSType.valueOf(args[3].toUpperCase());
         float price;
 
-        if (MarketPositionHandler.getAllPositionsFromItem(material).size() == 0) {
+        StoresConfig ins = new StoresConfig();
+        if (!ins.storeExists(material.name())) {
+
             sender.sendMessage(DynamicEeconomy.getPrefix() + ChatColor.RED + "Chosen item has no open market");
             return;
         }
 
-        if (args.length == 3) {
-            price = Float.parseFloat(args[2]);
+        if (args.length == 5) {
+            price = Float.parseFloat(args[4]);
         } else {
-            price = MarketPositionHandler.getExactPosition(LocalDateTime.now(), material).getPrice();
+            sender.sendMessage(material.name());
+            price = ins.getStore(material.name()).getPrice();
         }
 
-        Transaction transaction = new Transaction(material.name(), amount, price, "buy", Seller.getServerSeller(), LocalDateTime.now());
+        Transaction transaction = new Transaction(material.name(), amount, price, type, Seller.getServerSeller(), LocalDateTime.now());
         TransactionHandler.writeTransaction(transaction);
 
     }

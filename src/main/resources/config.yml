@@ -14,3 +14,10 @@ sellMultiplier: 0.8
 
 # Days between rounds of Automatic Price Stabilization
 APSDays: 1
+
+# Next timestamp that APS will be conducted on all stores that have set it. While this timestamp is regularly changed, it can be edited.
+nextAPS: aa
+
+#    How close should the established Sales per Active Hour (SAH) be to the desired quantity of a store
+# before the APS is considered "established"?
+establishPercent: 0.10

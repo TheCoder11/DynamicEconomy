@@ -2,13 +2,14 @@ package com.somemone.dynamiceeconomy.db.model;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import com.somemone.dynamiceeconomy.economy.ItemStore;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-@Builder
 @DatabaseTable(tableName = "transactions")
 public class Transaction {
 
@@ -49,24 +50,38 @@ public class Transaction {
     @Getter
     @Setter
     @DatabaseField(columnName = DATETIME_COLUMN_NAME)
-    private LocalDateTime datetime;
+    private Timestamp datetime;
 
     @Getter
     @Setter
     @DatabaseField(columnName = TYPE_COLUMN_NAME)
-    private String type; // "buy" or "sell"
+    private ItemStore.APSType type; // "buy" or "sell"
 
     public Transaction() {
 
     }
-
-    public Transaction(String material, int amount, float price, String type, Seller seller, LocalDateTime datetime) {
+    public Transaction(int id, String material, int amount, float price, ItemStore.APSType type, Seller seller, LocalDateTime datetime) {
+        this.id = id;
         this.material = material;
         this.amount = amount;
         this.price = price;
         this.seller = seller;
-        this.datetime = datetime;
+        this.datetime = Timestamp.valueOf(datetime);
         this.type = type;
 
+    }
+
+    public Transaction(String material, int amount, float price, ItemStore.APSType type, Seller seller, LocalDateTime datetime) {
+        this.material = material;
+        this.amount = amount;
+        this.price = price;
+        this.seller = seller;
+        this.datetime = Timestamp.valueOf(datetime);
+        this.type = type;
+
+    }
+
+    public LocalDateTime getDatetime() {
+        return datetime.toLocalDateTime();
     }
 }

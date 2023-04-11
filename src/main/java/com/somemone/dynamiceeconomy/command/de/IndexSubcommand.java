@@ -4,7 +4,6 @@ import com.somemone.dynamiceeconomy.DynamicEeconomy;
 import com.somemone.dynamiceeconomy.command.SubCommand;
 import com.somemone.dynamiceeconomy.economy.StapleIndex;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
@@ -30,7 +29,7 @@ public class IndexSubcommand extends SubCommand {
         Map<String, Float> stapleValues = new HashMap<>();
         for (String material : DynamicEeconomy.getPluginConfig().getMaterialsToIndex()) {
             StapleIndex index = new StapleIndex(material, Duration.ofDays(days));
-            stapleValues.put(material, index.getStapleIndexAHS());
+            stapleValues.put(material, index.getStapleIndexSAH());
         }
 
         String message = ChatColor.GREEN + "Active Hours per item obtained in the past " + days + " days: \n";

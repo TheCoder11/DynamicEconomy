@@ -1,6 +1,6 @@
 package com.somemone.dynamiceeconomy.command;
 
-import com.somemone.dynamiceeconomy.command.dedebug.AddTransactionSubcommand;
+import com.somemone.dynamiceeconomy.command.dedebug.*;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,6 +16,10 @@ public class DebugCommand implements CommandExecutor {
 
     public DebugCommand() {
         registerCommand("addtransaction", new AddTransactionSubcommand());
+        registerCommand("addsession", new AddSessionSubcommand());
+        registerCommand("help", new DEDebugHelpSubcommand());
+        registerCommand("runaps", new RunAPSSubcommand());
+        registerCommand("stats", new StatsSubcommand());
     }
 
     @Override
@@ -36,7 +40,7 @@ public class DebugCommand implements CommandExecutor {
         return true;
     }
 
-    public void registerCommand (String name, AddTransactionSubcommand subcommand) {
+    public void registerCommand (String name, SubCommand subcommand) {
         subcommands.put(name, subcommand);
     }
 }
